@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import LandingPage from "./pages/LandingPage";
@@ -8,11 +8,10 @@ import SeatSelectionPage from "./pages/SeatSelectionPage";
 import SignUpPage from "./pages/SignUpPage";
 import UserPage from "./pages/UserPage";
 import PaymentPage from "./pages/PaymentPage";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
-function App() {
-  const [login, setLogin] = useState(false);
-  const [signup, setSignup] = useState(false);
-  const [userData, setUserData] = useState({});
+function AppContent() {
+  const { signup } = useAuth();
 
   // Check for expired JWT token and clear localStorage if expired
   useEffect(() => {
@@ -43,78 +42,31 @@ function App() {
   }, []);
 
   return (
-    <div className="App" >
-      {signup && (
-        <SignUpPage
-          setSignup={setSignup}
-          checkSignup={signup}
-          setLogin={setLogin}
-          setUserData={setUserData}
-          // checkLogin={login}
-        />
-      )}
+    <div className="App">
+      {signup && <SignUpPage />}
 
       {!signup && (
         <BrowserRouter>
-          <Header
-            setLogin={setLogin}
-            checkLogin={login}
-            setSignup={setSignup}
-            checkSignup={signup}
-          />
+          <Header />
           <Routes>
-            <Route
-              exact
-              path="/"
-              element={
-                <LandingPage
-                  setLogin={setLogin}
-                  checkLogin={login}
-                  setSignup={setSignup}
-                  checkSignup={signup}
-                  setUserData={setUserData}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/theatreSelection"
-              element={
-                <TheatreSelectionPage
-                  setLogin={setLogin}
-                  checkLogin={login}
-                  setSignup={setSignup}
-                  checkSignup={signup}
-                  setUserData={setUserData}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/seatSelection"
-              element={
-                <SeatSelectionPage
-                  setLogin={setLogin}
-                  checkLogin={login}
-                  setSignup={setSignup}
-                  checkSignup={signup}
-                  setUserData={setUserData}
-                />
-              }
-            />
-            <Route
-              exact
-              path="/user"
-              element={
-                <UserPage setUserData={setUserData} userData={userData} />
-              }
-            />
+            <Route exact path="/" element={<LandingPage />} />
+            <Route exact path="/theatreSelection" element={<TheatreSelectionPage />} />
+            <Route exact path="/seatSelection" element={<SeatSelectionPage />} />
+            <Route exact path="/user" element={<UserPage />} />
             <Route exact path="/payment" element={<PaymentPage />} />
           </Routes>
           <Footer />
         </BrowserRouter>
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
