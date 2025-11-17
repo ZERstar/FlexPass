@@ -1,20 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import bg from '../assets/order-bg.png'
 import { TezosToolkit } from "@taquito/taquito";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import { NetworkType } from "@airgap/beacon-dapp";
-// import { wallet } from "./MyWallet";
-
 
 export default function OrderSummary(props) {
-  // const [seatType, setSeatType] = useState({
-  //   budget:0,
-  //   elite:0
-  // });
-  const Tezos = new TezosToolkit("https://ghostnet.smartpy.io");
-
-
-
+  const Tezos = new TezosToolkit(process.env.REACT_APP_TEZOS_RPC_URL);
 
   const seats = props.seats;
   const convenience = seats.length * 49;
@@ -23,42 +14,24 @@ export default function OrderSummary(props) {
     elite: 0,
   };
 
-
-
   const wallet = new BeaconWallet({
     name: "FlexPass  Dapp",
     preferredNetwork: NetworkType.GHOSTNET,
+  });
 
-})
-  
-Tezos.setWalletProvider(wallet);
-
+  Tezos.setWalletProvider(wallet);
   Tezos.setProvider({ config: { streamerPollingIntervalMilliseconds: 150000000 } });
-  // wallet.then((_) => wallet.getPKH())  
-
-  // const sub = Tezos.stream.subscribeOperation(filter)
 
   seats.forEach((seat) => {
-    console.log("abcd", seat.slice(0, 1));
     const row = seat.slice(0, 1);
     if (row === "K" || row === "L") {
-      // setSeatType(seatType.elite+1)
       seatType.elite += 1;
     } else {
-      // setSeatType(seatType.budget+1)
       seatType.budget += 1;
     }
   });
 
-  // Define the contract address (KT1 address)
-  // const contractAddress = "KT1S2DUhxuvKwL1w8q51tBAb7kVbdVkF423r";
-  Tezos.setWalletProvider(wallet);
-  // const userAddress = wallet.pkh ;
-
-
-  // Define your contract address
-  const contractAddress = "KT1St9YErFaeLjNjZXYFmqJY1W3UXrb5LRZh";
-  // const contractAddress = "KT1Aa65MmvRDUTqeEuYKrHN7YUNKneTNmRPg";
+  const contractAddress = process.env.REACT_APP_TEZOS_CONTRACT_ADDRESS;
 
   // Call an entry point on your contract (e.g., createTicket)
 const TicketProcessing = async () => {
@@ -68,21 +41,18 @@ const TicketProcessing = async () => {
 
     // Request wallet permissions
     const permissions = await wallet.client.requestPermissions();
-    console.log("Got permissions:", permissions.address);
 
     // Call the smart contract method to buy a ticket with the specified tezAmount
     const operation = await contract.methods
       .createTicket()
       .send({ amount: 1, mutez: false });
 
-    console.log("Waiting for confirmation...");
-
     // Wait for the operation confirmation
     await operation.confirmation(1);
 
-    console.log("Ticket bought successfully!");
-    console.log(wallet.getPKH());
+    alert("Ticket bought successfully!");
   } catch (error) {
+    alert("Failed to purchase ticket. Please try again.");
     console.error("Error buying ticket:", error);
   }
 };
@@ -92,7 +62,6 @@ const TicketProcessing = async () => {
   const seatPrice = seatType.elite * 350 + seatType.budget * 250;
   const taxes = ((seatPrice + convenience) * 0.15).toFixed(2);
   const total = Number(seatPrice) + Number(convenience) + Number(taxes);
-  console.log(seatType, seatPrice);
 
   return (
     <div className="rounded-xl flex justify-center">
@@ -114,9 +83,9 @@ const TicketProcessing = async () => {
                   (
                   {seats.map((seat, index) => {
                     if (index < seats.length - 1) {
-                      return `${seat}, `;
+                      return <span key={index}>{seat}, </span>;
                     } else {
-                      return `${seat}`;
+                      return <span key={index}>{seat}</span>;
                     }
                   })}
                   )

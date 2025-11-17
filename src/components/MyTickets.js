@@ -1,29 +1,9 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import ResellTicket from "./ResellTicket";
 import TicketLogElement from "./TicketLogElement";
 
 const MyTickets = () => {
-  // const [movies, setMovies] = useState([]);
-  // const [check, setCheck] = useState(false);
-
-  // useEffect(() => {
-  //   axios({
-  //     method: "get",
-  //     // url: `https://flexpass-back.onrender.com/movie/getAllMovies`
-  //     url: `http://127.0.0.1:8000/movie/getAllMovies`
-  //   })
-  //     .then((response) => {
-  //       // setSplitInto(response.data.userNames)
-  //       console.log("data", response.data);
-  //       setCheck(true)
-  //       setMovies(response.data);
-  //       console.log("state", movies);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  //   }, [0]);
+  // TODO: Implement API call to fetch user's tickets from backend
 
   return (
     <div className="my-10 mx-16">

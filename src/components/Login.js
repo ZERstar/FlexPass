@@ -6,28 +6,24 @@ export default function LogInPage(props) {
   const [see, setSee] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [data, setData]= useState({})
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // console.log(data);
     axios({
       method: "post",
-      url: "https://shiny-scarf-fawn.cyclic.app/user/login",
-      // url: "http://192.168.1.15:8000/user/login",
+      url: `${process.env.REACT_APP_API_BASE_URL}/user/login`,
       data: { email: email, password: password.toString() },
     })
       .then(function (response) {
         localStorage.setItem("jwt_token", JSON.stringify({token:response.data.user.token, time:new Date().getTime()}));
-        props.setUserData(response.data.user)
-        // console.log("ress",data);
+        props.setUserData(response.data.user);
         props.setLogin(!props.login);
       })
       .catch(function (error) {
-        console.log(error);
+        alert("Login failed. Please check your credentials.");
+        console.error("Login error:", error);
       });
-      // console.log("ress",data);
   };
 
   return (
@@ -72,7 +68,6 @@ export default function LogInPage(props) {
                       <PiEyeBold
                         onClick={() => {
                           setSee(false);
-                          console.log(see);
                         }}
                       />
                     )}

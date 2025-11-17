@@ -2,30 +2,12 @@ import profileImg from "../assets/profile-img.jpg";
 import React from "react";
 import { BsTicketPerforatedFill } from "react-icons/bs";
 import { FaWallet } from "react-icons/fa";
-import { TezosToolkit } from "@taquito/taquito";
-// import { TempleWallet } from '@temple-wallet/dapp';
-
-
-// Initialize Tezos toolkit
-// const Tezos = new TezosToolkit('https://testnet-tezos.giganode.io');
 
 export default function UserDetails(props) {
-
-
-
-  async function requestPermissions() {
-    // try {
-    //   console.log("Requesting permissions...");
-      // const permissions = await wallet.client.requestPermissions();
-    //   console.log("Got permissions:", permissions.address);
-    // } catch (error) {
-    //   console.log("Got error:", error);
-    // }
-  }
-
   const handleTicket = () => {
     props.setButton(1);
   };
+
   const handleWallet = () => {
     props.setButton(2);
   };

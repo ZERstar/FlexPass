@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import LandingPage from "./pages/LandingPage";
-import { BrowserRouter, Routes, Route, Router } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import TheatreSelectionPage from "./pages/TheatreSelectionPage";
 import SeatSelectionPage from "./pages/SeatSelectionPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -14,22 +14,33 @@ function App() {
   const [signup, setSignup] = useState(false);
   const [userData, setUserData] = useState({});
 
-  // const [checkLog, setCheckLog] = useState("")
-  // console.log("log", userData)
+  // Check for expired JWT token and clear localStorage if expired
+  useEffect(() => {
+    const localData = localStorage.getItem("jwt_token");
+    if (localData) {
+      try {
+        const time = JSON.parse(localData);
 
-  var now = new Date().getTime();
-  var localData = localStorage.getItem("jwt_token");
-  if (localData) {
-    var time = JSON.parse(localData);
-    var diff;
-    setInterval(() => {
-      diff = now - time.time;
-      if (diff > 60 * 60 * 1000) {
+        // Check token expiration every minute
+        const intervalId = setInterval(() => {
+          const now = new Date().getTime();
+          const diff = now - time.time;
+
+          // Clear localStorage if token is older than 1 hour
+          if (diff > 60 * 60 * 1000) {
+            localStorage.clear();
+            clearInterval(intervalId);
+          }
+        }, 60000); // Check every minute instead of every second
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(intervalId);
+      } catch (error) {
+        // Invalid JSON in localStorage, clear it
         localStorage.clear();
       }
-    }, 1000);
-  }
-  // localStorage.clear();
+    }
+  }, []);
 
   return (
     <div className="App" >

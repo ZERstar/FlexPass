@@ -13,30 +13,29 @@ export default function SignUpPage(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (password !== conPassword) {
-      console.log("Check password");
+      alert("Passwords do not match. Please check and try again.");
+      return;
     }
-    else {
-      axios({
-        method: "post",
-        url: "https://shiny-scarf-fawn.cyclic.app/user/signup",
-        // url: "http://127.0.0.1:8000/user/signup",
-        data: {
-          name: name,
-          email: email,
-          phone: phone,
-          password: password.toString(),
-        },
+
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_API_BASE_URL}/user/signup`,
+      data: {
+        name: name,
+        email: email,
+        phone: phone,
+        password: password.toString(),
+      },
+    })
+      .then(function (response) {
+        localStorage.setItem("jwt_token", JSON.stringify({token:response.data.user.token, time:new Date().getTime()}));
+        props.setUserData(response.data.user);
+        props.setSignup(!props.checkSignup);
       })
-        .then(function (response) {
-          localStorage.setItem("jwt_token", JSON.stringify({token:response.data.user.token, time:new Date().getTime()}));
-          props.setUserData(response.data.user)
-          console.log(response);
-          props.setSignup(!props.checkSignup);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }
+      .catch(function (error) {
+        alert("Signup failed. Please try again.");
+        console.error("Signup error:", error);
+      });
   };
   return (
     <div className="w-full h-screen flex">

@@ -5,8 +5,8 @@ import orangeDot from "../assets/orange-circle.png";
 import greenDot from "../assets/green-circle.png";
 
 export default function TheatreDetails(props) {
-  const navigate = useNavigate()
-  // console.log("the", props.theatres);
+  const navigate = useNavigate();
+
   return (
     <div className=" w-full h-screen">
       <div className=" px-20 py-6  flex flex-col">
@@ -28,8 +28,8 @@ export default function TheatreDetails(props) {
               </div>
             </div>
             {props.theatres.map((theatre) => {
-              return( 
-                <div onClick={()=>{
+              return(
+                <div key={theatre._id} onClick={()=>{
                   navigate('/seatSelection',{state:{theatre:theatre, movie:props.movie}});
                 }}>
                 <ShowDetails name = {theatre}/>

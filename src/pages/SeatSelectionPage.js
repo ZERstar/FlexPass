@@ -10,9 +10,7 @@ export default function TheaterSeat(props) {
   const navigate = useNavigate();
   const theatre = location.state.theatre;
   const movie = location.state.movie;
-  console.log({theatre, movie})
   const [seats, setSeats] = useState([]);
-  // console.log("det", seats);
 const token = localStorage.getItem("jwt_token")
 const handleBook = () => {
   if(token && seats.length>0){

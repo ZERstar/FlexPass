@@ -4,8 +4,8 @@ import { FaUserCircle } from "react-icons/fa";
 
 const Header = (props) => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("jwt_token")
-  console.log("tt",token)
+  const token = localStorage.getItem("jwt_token");
+
   return (
     <header className="relative w-full h-[5.5rem] overflow-hidden text-white font-inter">
       <div className="absolute inset-0 w-full h-[6.06rem]">
@@ -29,7 +29,6 @@ const Header = (props) => {
         <button
           className="flex justify-center items-center relative h-75 w-200 rounded-full border border-solid border-white bg-transparent"
           onClick={() => {
-            // console.log("djcnw",props.checkLogin)
             props.setLogin(!props.checkLogin);
           }}
         >

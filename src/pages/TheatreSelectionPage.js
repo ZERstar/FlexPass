@@ -8,7 +8,7 @@ import LogInPage from "../components/Login";
 export default function TheatreSelectionPage(props) {
   const location = useLocation();
   const data = location.state;
-  console.log("data", data)
+
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <LogInPage login={props.checkLogin} setLogin={props.setLogin} setSignup={props.setSignup} signup={props.checkSignup} setUserData={props.setUserData}/>
