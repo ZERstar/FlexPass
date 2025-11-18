@@ -5,13 +5,15 @@ import SeatRow from "../components/SeatRow";
 import MovieBanner from "../components/MovieBanner";
 import LogInPage from "../components/Login";
 import { DEFAULT_THEATER_LAYOUT } from "../config/theaterLayout";
+import { useAuth } from "../context/AuthContext";
 
-export default function TheaterSeat(props) {
+export default function TheaterSeat() {
   const location = useLocation();
   const navigate = useNavigate();
   const theatre = location.state.theatre;
   const movie = location.state.movie;
   const [seats, setSeats] = useState([]);
+  const { setLogin } = useAuth();
   const token = localStorage.getItem("jwt_token");
 
   const handleBook = () => {
@@ -19,19 +21,13 @@ export default function TheaterSeat(props) {
       navigate('/payment', { state: { seats, movie: movie._id, theatre: theatre._id, status: "first" } });
     }
     if (!token) {
-      props.setLogin(true);
+      setLogin(true);
     }
   };
 
   return (
     <div className="relative z-0">
-      <LogInPage
-        login={props.checkLogin}
-        setLogin={props.setLogin}
-        setSignup={props.setSignup}
-        signup={props.checkSignup}
-        setUserData={props.setUserData}
-      />
+      <LogInPage />
 
       <MovieBanner
         name={movie.name}
