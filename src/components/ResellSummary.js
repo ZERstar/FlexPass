@@ -1,51 +1,36 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FaLocationDot } from 'react-icons/fa6'
-import { TezosToolkit } from "@taquito/taquito";
-import { BeaconWallet } from "@taquito/beacon-wallet";
-import { NetworkType } from "@airgap/beacon-dapp";
-
-const tezos = new TezosToolkit(process.env.REACT_APP_TEZOS_RPC_URL);
-
-tezos.setProvider({ config: { streamerPollingIntervalMilliseconds: 1500000000 } });
-
-const contractAddress = process.env.REACT_APP_TEZOS_CONTRACT_ADDRESS;
-
-const wallet = new BeaconWallet({
-    name: "FlexPass  Dapp",
-    preferredNetwork: NetworkType.GHOSTNET,
-})
-
-const purchaseTicket = async (tezAmount, receiverAddress) => {
-    try {
-      // Load the contract instance
-      const contract = await tezos.wallet.at(contractAddress);
-
-      // Request wallet permissions
-      const permissions = await wallet.client.requestPermissions();
-
-      // Call the smart contract method to buy a ticket with the specified tezAmount
-      const operation = await contract.methods
-        .purchaseTicket()
-        .send({ amount: tezAmount, mutez: false, receiver: receiverAddress });
-
-      // Wait for the operation confirmation
-      await operation.confirmation(1);
-
-      alert("Ticket resold successfully!");
-    } catch (error) {
-      console.error("Error reselling ticket:", error);
-      alert("Failed to resell ticket. Please try again.");
-    }
-  };
-  
-  
+import { useBlockchain } from "../blockchain";
 
 export default function ResellSummary() {
+    const { purchaseTicket, isInitialized, isConnecting } = useBlockchain();
+    const [isProcessing, setIsProcessing] = useState(false);
+
     // TODO: These values should come from props/state based on the ticket being resold
-    const handleResell = () => {
-        const tezAmount = 1; // Amount should be calculated from ticket price
-        const receiverAddress = "tz1WsmHMwt1JTsEc1DEqNbhWB517hTJGszNn"; // Should come from buyer
-        purchaseTicket(tezAmount, receiverAddress);
+    const handleResell = async () => {
+        if (!isInitialized) {
+            alert("Blockchain provider not initialized. Please try again.");
+            return;
+        }
+
+        setIsProcessing(true);
+
+        try {
+            const result = await purchaseTicket({
+                amount: 1, // Amount should be calculated from ticket price
+                receiverAddress: "tz1WsmHMwt1JTsEc1DEqNbhWB517hTJGszNn", // Should come from buyer
+                ticketData: {
+                    // Additional ticket data can be passed here
+                }
+            });
+
+            alert(result.message || "Ticket resold successfully!");
+        } catch (error) {
+            console.error("Error reselling ticket:", error);
+            alert("Failed to resell ticket. Please try again.");
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     return (
@@ -117,7 +102,12 @@ export default function ResellSummary() {
                             <div className="flex px-50 py-5 items-center justify-center w-3/4">
                               <div className="rounded-xl [background:linear-gradient(90.57deg,#628eff,#8740cd_53.13%,#580475)] w-full py-2 mb-2">
                                   <div className="py-1 text-white text-center text-5xl font-semibold cursor-pointer">
-                                       <button onClick={handleResell}>Resell</button>
+                                       <button
+                                          onClick={handleResell}
+                                          disabled={isProcessing || isConnecting || !isInitialized}
+                                       >
+                                          {isProcessing ? 'Processing...' : 'Resell'}
+                                       </button>
                                   </div>
                                 </div>
                            </div>

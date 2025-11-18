@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import bg from '../assets/order-bg.png'
-import { TezosToolkit } from "@taquito/taquito";
-import { BeaconWallet } from "@taquito/beacon-wallet";
-import { NetworkType } from "@airgap/beacon-dapp";
+import { useBlockchain } from "../blockchain";
 
 export default function OrderSummary(props) {
-  const Tezos = new TezosToolkit(process.env.REACT_APP_TEZOS_RPC_URL);
+  const { createTicket, isInitialized, isConnecting } = useBlockchain();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const seats = props.seats;
   const convenience = seats.length * 49;
@@ -13,14 +12,6 @@ export default function OrderSummary(props) {
     budget: 0,
     elite: 0,
   };
-
-  const wallet = new BeaconWallet({
-    name: "FlexPass  Dapp",
-    preferredNetwork: NetworkType.GHOSTNET,
-  });
-
-  Tezos.setWalletProvider(wallet);
-  Tezos.setProvider({ config: { streamerPollingIntervalMilliseconds: 150000000 } });
 
   seats.forEach((seat) => {
     const row = seat.slice(0, 1);
@@ -31,31 +22,32 @@ export default function OrderSummary(props) {
     }
   });
 
-  const contractAddress = process.env.REACT_APP_TEZOS_CONTRACT_ADDRESS;
+  // Process ticket purchase using blockchain abstraction
+  const TicketProcessing = async () => {
+    if (!isInitialized) {
+      alert("Blockchain provider not initialized. Please try again.");
+      return;
+    }
 
-  // Call an entry point on your contract (e.g., createTicket)
-const TicketProcessing = async () => {
-  try {
-    // Load the contract instance
-    const contract = await Tezos.wallet.at(contractAddress);
+    setIsProcessing(true);
 
-    // Request wallet permissions
-    const permissions = await wallet.client.requestPermissions();
+    try {
+      const result = await createTicket({
+        amount: 1,
+        ticketData: {
+          seats,
+          seatType,
+        }
+      });
 
-    // Call the smart contract method to buy a ticket with the specified tezAmount
-    const operation = await contract.methods
-      .createTicket()
-      .send({ amount: 1, mutez: false });
-
-    // Wait for the operation confirmation
-    await operation.confirmation(1);
-
-    alert("Ticket bought successfully!");
-  } catch (error) {
-    alert("Failed to purchase ticket. Please try again.");
-    console.error("Error buying ticket:", error);
-  }
-};
+      alert(result.message || "Ticket bought successfully!");
+    } catch (error) {
+      alert("Failed to purchase ticket. Please try again.");
+      console.error("Error buying ticket:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
 
   
@@ -136,7 +128,12 @@ const TicketProcessing = async () => {
                 <div
                   className=" rounded-xl [background:linear-gradient(90.57deg,#628eff,#8740cd_53.13%,#580475)] w-full py-2 mb-2 ">
                   <div className="py-1 text-center text-5xl font-semibold cursor-pointer">
-                  <button onClick={TicketProcessing}>Place Order</button>
+                  <button
+                    onClick={TicketProcessing}
+                    disabled={isProcessing || isConnecting || !isInitialized}
+                  >
+                    {isProcessing ? 'Processing...' : 'Place Order'}
+                  </button>
 
                   </div>
                 </div>
