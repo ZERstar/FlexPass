@@ -10,6 +10,7 @@ import UserPage from "./pages/UserPage";
 import PaymentPage from "./pages/PaymentPage";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { BlockchainContextProvider } from "./blockchain";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function AppContent() {
   const { signup } = useAuth();
@@ -65,11 +66,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <BlockchainContextProvider>
-        <AppContent />
-      </BlockchainContextProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BlockchainContextProvider>
+          <AppContent />
+        </BlockchainContextProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
