@@ -9,19 +9,15 @@ export default function   CardBase() {
   useEffect(() => {
     axios({
       method: "get",
-      url: `https://shiny-scarf-fawn.cyclic.app/movie/getAllMovies`
+      url: `${process.env.REACT_APP_API_BASE_URL}/movie/getAllMovies`
     })
       .then((response) => {
-        // setSplitInto(response.data.userNames)
-        console.log("data", response.data);
-
         setMovies(response.data);
-        console.log("state", movies);
       })
       .catch((error) => {
-        console.log(error);
+        console.error("Error fetching movies:", error);
       });
-  }, [0]);
+  }, []);
 
   return (
     <div className="text-white capitalize font-semibold  text-[4rem]">
@@ -30,7 +26,7 @@ export default function   CardBase() {
       <div className="grid grid-cols-3 justify-items-start ">
         {movies.map((movie) => {
           return (
-            <div onClick={()=>{
+            <div key={movie._id} onClick={()=>{
               navigate('/theatreSelection',{state:movie});
             }}>
                 <MovieCard
@@ -41,11 +37,6 @@ export default function   CardBase() {
             </div>
           );
         })}
-
-        {/* <MovieCard />
-        <MovieCard />
-        <MovieCard />
-        <MovieCard /> */}
       </div>
     </div>
   );

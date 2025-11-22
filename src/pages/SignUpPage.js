@@ -2,58 +2,58 @@ import React, { useState } from "react";
 import check from "../assets/check-mark.png";
 import signup from "../assets/signup-bg.svg";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
-export default function SignUpPage(props) {
+export default function SignUpPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [conPassword, setConPassword] = useState("");
+  const { setUserData, setSignup, setLogin } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (password !== conPassword) {
-      console.log("Check password");
+      alert("Passwords do not match. Please check and try again.");
+      return;
     }
-    else {
-      axios({
-        method: "post",
-        url: "https://shiny-scarf-fawn.cyclic.app/user/signup",
-        // url: "http://127.0.0.1:8000/user/signup",
-        data: {
-          name: name,
-          email: email,
-          phone: phone,
-          password: password.toString(),
-        },
+
+    axios({
+      method: "post",
+      url: `${process.env.REACT_APP_API_BASE_URL}/user/signup`,
+      data: {
+        name: name,
+        email: email,
+        phone: phone,
+        password: password.toString(),
+      },
+    })
+      .then(function (response) {
+        localStorage.setItem("jwt_token", JSON.stringify({token:response.data.user.token, time:new Date().getTime()}));
+        setUserData(response.data.user);
+        setSignup(false);
       })
-        .then(function (response) {
-          localStorage.setItem("jwt_token", JSON.stringify({token:response.data.user.token, time:new Date().getTime()}));
-          props.setUserData(response.data.user)
-          console.log(response);
-          props.setSignup(!props.checkSignup);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }
+      .catch(function (error) {
+        alert("Signup failed. Please try again.");
+        console.error("Signup error:", error);
+      });
   };
+
   return (
     <div className="w-full h-screen flex">
       <span
         className="absolute z-10 text-white top-10 left-10 text-[34px] cursor-pointer"
-        onClick={() => {
-          props.setSignup(!props.checkSignup);
-        }}
+        onClick={() => setSignup(false)}
       >
         &lt;--
       </span>
-      <div className=" w-full relative h-screen ">
+      <div className="w-full relative h-screen">
         <div>
-          <img className=" w-full h-screen object-cover" src={signup} alt="" />
+          <img className="w-full h-screen object-cover" src={signup} alt="" />
         </div>
       </div>
-      <div className=" w-3/5 absolute right-0 z-10 h-screen  ml-auto text-left text-base bg-[#5952ac] text-white font-noto-sans px-36 py-10 rounded-l-[90px]">
+      <div className="w-3/5 absolute right-0 z-10 h-screen ml-auto text-left text-base bg-[#5952ac] text-white font-noto-sans px-36 py-10 rounded-l-[90px]">
         <div className="flex flex-col items-start justify-start">
           <div className="relative font-medium">
             Just some details to get you in.!
@@ -65,49 +65,39 @@ export default function SignUpPage(props) {
             className="rounded-xl text-white text-[20px] mb-6 box-border w-full py-3 px-5 border-2 border-solid border-white bg-transparent placeholder-white focus:outline-none"
             type="text"
             placeholder="Username"
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
+            onChange={(e) => setName(e.target.value)}
           />
           <input
             className="rounded-xl text-white text-[20px] mb-6 box-border w-full py-3 px-5 border-2 border-solid border-white bg-transparent placeholder-white focus:outline-none"
             type="text"
             placeholder="Phone"
-            onChange={(e) => {
-              setPhone(e.target.value);
-            }}
+            onChange={(e) => setPhone(e.target.value)}
           />
           <input
             className="rounded-xl text-white text-[20px] mb-6 box-border w-full py-3 px-5 border-2 border-solid border-white bg-transparent placeholder-white focus:outline-none"
             type="text"
             placeholder="Email"
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             className="rounded-xl text-white text-[20px] mb-6 box-border w-full py-3 px-5 border-2 border-solid border-white bg-transparent placeholder-white focus:outline-none"
             type="password"
             placeholder="Password"
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <input
             className="rounded-xl text-white text-[20px] mb-6 box-border w-full py-3 px-5 border-2 border-solid border-white bg-transparent placeholder-white focus:outline-none"
             type="password"
             placeholder="Confirm Password"
-            onChange={(e) => {
-              setConPassword(e.target.value);
-            }}
+            onChange={(e) => setConPassword(e.target.value)}
           />
           <div className="flex space-x-1 items-center mb-6">
-            <img src={check} />
+            <img src={check} alt="" />
             <div>Remember Me</div>
           </div>
-          <div className=" rounded-xl [background:linear-gradient(90.57deg,#628eff,#8740cd_53.13%,#580475)] w-full py-2 mb-2">
+          <div className="rounded-xl [background:linear-gradient(90.57deg,#628eff,#8740cd_53.13%,#580475)] w-full py-2 mb-2">
             <div
-              className=" py-1 text-center text-5xl font-semibold cursor-pointer"
+              className="py-1 text-center text-5xl font-semibold cursor-pointer"
               onClick={handleSubmit}
             >
               Sign Up
@@ -116,14 +106,14 @@ export default function SignUpPage(props) {
           <div
             className="mt-6 text-3xl font-sans font-medium text-center mx-auto cursor-pointer"
             onClick={() => {
-              props.setLogin(!props.checkLogin);
-              props.setSignup(!props.checkSignup);
+              setLogin(true);
+              setSignup(false);
             }}
           >
             Already Registered? Login
           </div>
           <div className="flex mx-auto">
-            <div className="mt-6 text-3xl mr-5  font-sans font-medium text-center">
+            <div className="mt-6 text-3xl mr-5 font-sans font-medium text-center">
               Terms & Conditions
             </div>
             <div className="mt-6 text-3xl mr-5 font-sans font-medium text-center">

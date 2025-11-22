@@ -3,8 +3,11 @@ import UserDetails from "../components/UserDetails";
 import bg from "../assets/bg.svg";
 import MyTickets from "../components/MyTickets";
 import MyWallet from "../components/MyWallet";
-export default function UserPage(props) {
+import { useAuth } from "../context/AuthContext";
+
+export default function UserPage() {
   const [button, setButton] = useState(1);
+  const { userData } = useAuth();
 
   return (
     <div className="h-screen w-full flex justify-start items-start">
@@ -12,7 +15,7 @@ export default function UserPage(props) {
       <div className="w-full absolute z-10">
         <div className="bg-[#1A142F] w-1/4 h-screen">
           <UserDetails
-            userData={props.userData}
+            userData={userData}
             button={button}
             setButton={setButton}
           />

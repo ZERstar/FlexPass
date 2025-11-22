@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { FaLocationDot } from "react-icons/fa6";
-import axios from "axios";
 
 export default function TicketLogElement(props) {
   return (

@@ -2,38 +2,36 @@ import React, { useState } from "react";
 import { PiEyeClosedBold, PiEyeBold } from "react-icons/pi";
 import axios from "axios";
 import check from "../assets/check-mark.png";
-export default function LogInPage(props) {
+import { useAuth } from "../context/AuthContext";
+
+export default function LogInPage() {
   const [see, setSee] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [data, setData]= useState({})
+  const { login, setLogin, setSignup, setUserData } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // console.log(data);
     axios({
       method: "post",
-      url: "https://shiny-scarf-fawn.cyclic.app/user/login",
-      // url: "http://192.168.1.15:8000/user/login",
+      url: `${process.env.REACT_APP_API_BASE_URL}/user/login`,
       data: { email: email, password: password.toString() },
     })
       .then(function (response) {
         localStorage.setItem("jwt_token", JSON.stringify({token:response.data.user.token, time:new Date().getTime()}));
-        props.setUserData(response.data.user)
-        // console.log("ress",data);
-        props.setLogin(!props.login);
+        setUserData(response.data.user);
+        setLogin(false);
       })
       .catch(function (error) {
-        console.log(error);
+        alert("Login failed. Please check your credentials.");
+        console.error("Login error:", error);
       });
-      // console.log("ress",data);
   };
 
   return (
     <div>
-      {" "}
-      {props.login && (
+      {login && (
         <div className="  absolute z-10 w-screen h-[85vh] flex justify-center items-center">
           <div className=" rounded-[20px] [background:linear-gradient(-38.77deg,_rgba(191,_191,_191,_0.06),_rgba(0,_0,_0,_0)),_rgba(0,_0,_0,_0.14)] shadow-[-8px_4px_5px_rgba(0,_0,_0,_0.24)] [backdrop-filter:blur(53px)] w-[30%] h-[605px] text-left text-white font-noto-sans">
             {" "}
@@ -72,7 +70,6 @@ export default function LogInPage(props) {
                       <PiEyeBold
                         onClick={() => {
                           setSee(false);
-                          console.log(see);
                         }}
                       />
                     )}
@@ -97,11 +94,11 @@ export default function LogInPage(props) {
               <div
                 className="mt-6 text-3xl font-sans font-medium text-center cursor-pointer"
                 onClick={() => {
-                  props.setLogin(!props.login);
-                  props.setSignup(!props.signup);
+                  setLogin(false);
+                  setSignup(true);
                 }}
               >
-                Don’t have an account ? Signup
+                Don't have an account ? Signup
               </div>
             </div>
           </div>
@@ -109,7 +106,7 @@ export default function LogInPage(props) {
             className="absolute cursor-pointer top-10 right-20 text-white text-[32px]"
             style={{ zIndex: 3 }}
             onClick={() => {
-              props.setLogin(false);
+              setLogin(false);
             }}
           >
             X
